@@ -1,10 +1,8 @@
-# Genesis-core-AGC-
-Web3
 # Genesis Core (AGC)
 
-Genesis Core (AGC) is a utility token developed as part of a long-term Web3 ecosystem focused on digital identity, NFT fan tokens, and decentralized interaction.
+Genesis Core (AGC) is a utility token developed as part of a long-term Web3 ecosystem focused on NFT fan tokens, multi-layer token systems, and decentralized digital identity mechanics.
 
-The token is used as a core asset within the Genesis Core ecosystem and is deployed on the Polygon (PoS) network.
+The project is designed for gradual ecosystem expansion, with transparent token supply logic and on-chain deployment on the Polygon (PoS) network.
 
 ---
 
@@ -12,15 +10,26 @@ The token is used as a core asset within the Genesis Core ecosystem and is deplo
 
 - **Name:** Genesis Core
 - **Symbol:** AGC
+- **Token Standard:** ERC-20
 - **Network:** Polygon (PoS)
 - **Contract Address:**  
   `0xF5850Ef30c280B66C3DeD80291A6aBe50c2A3360`
 
 ---
 
+## Supply & Minting
+
+- **Initial Supply:** 1,000 AGC
+- **Future Supply Expansion:**  
+  Up to 10,000 AGC may be minted in the future as part of planned ecosystem growth and utility expansion.
+- **Minting Policy:**  
+  Additional minting is intended for ecosystem development and will be executed transparently on-chain.
+
+---
+
 ## Trading
 
-AGC is currently traded on decentralized exchanges via liquidity pools on Polygon.
+Genesis Core (AGC) is currently traded on decentralized exchanges via liquidity pools on the Polygon network.
 
 - **DEX:** QuickSwap  
 - **Trading Pair:** AGC / WMATIC  
@@ -29,30 +38,23 @@ AGC is currently traded on decentralized exchanges via liquidity pools on Polygo
 
 ---
 
-## Supply
-
-- **Total Supply:** Fixed  
-- **Minting:** Disabled after deployment  
-- **Token Type:** ERC-20
-
----
-
 ## Use Case
 
 Genesis Core is designed to support:
 - NFT fan token mechanics
 - Multi-layer token ecosystems
-- On-chain identity and access logic
+- On-chain access logic
+- Digital identity and community interaction
 - Future governance and utility integrations
 
 ---
 
 ## Security & Transparency
 
-- Smart contract deployed on Polygon
-- No proxy / upgradeable contract
+- Smart contract deployed on Polygon (PoS)
+- No proxy or upgradeable contract structure
 - Token is freely transferable
-- No hidden mint or blacklist functions
+- No hidden blacklist or anti-sell mechanisms
 
 ---
 
@@ -68,4 +70,4 @@ Genesis Core is designed to support:
 
 ## Disclaimer
 
-Genesis Core (AGC) is a utility token intended for use within the Genesis Core ecosystem. This repository is provided for transparency and informational purposes.
+Genesis Core (AGC) is a utility token intended for use within the Genesis Core ecosystem. This repository is provided for transparency and informational purposes only.
