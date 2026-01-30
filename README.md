@@ -1,3 +1,5 @@
+![AGC Logo](./logo.png)
+
 # Genesis Core (AGC)
 
 Genesis Core (AGC) is a utility token developed as part of a long-term Web3 ecosystem focused on NFT fan tokens, multi-layer token systems, and decentralized digital identity mechanics.
