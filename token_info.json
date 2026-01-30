@@ -1,0 +1,9 @@
+{
+  "name": "Genesis Core",
+  "symbol": "AGC",
+  "network": "Polygon",
+  "contract_address": "0xF5850Ef30c280B66C3DeD80291A6aBe50c2A3360",
+  "dex": "QuickSwap",
+  "pair": "AGC/WMATIC",
+  "geckoterminal_pool": "https://www.geckoterminal.com/polygon_pos/pools/0x94d3a1fe4c8bc32ced23f2ae2d3f2169e1f7b0b5"
+}
