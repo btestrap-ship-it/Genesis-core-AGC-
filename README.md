@@ -10,24 +10,24 @@
 - ERC-20 token, total supply: 1,000 AGC
 - Foundation layer for NFT levels and ecosystem trust
 - Status: Completed / Legacy
-- Assets: `assets/v1/`  
-  - ![v1 PNG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v1/logo.png)  
-  - [v1 SVG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v1/logo.svg)
+- Assets: `assets/v1-agc/`  
+  - ![v1 PNG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/f3640298283f24b065a82c99856c0a80be711fb3/assets/v1-agc/logo.png)  
+  - [v1 SVG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v1-agc/logo.svg)
 
 **WAGC v2 — Silver (Active Development)**
 - ERC-20 wrapped token extending AGC v1
 - Designed for NFT integrations, DeFi, and Web3 expansions
 - Status: Active
-- Assets: `assets/v2/`  
-  - ![v2 PNG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v2/logo.png)  
-  - [v2 SVG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v2/logo.svg)
+- Assets: `assets/v2-wagc/`  
+  - ![v2 PNG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/f3640298283f24b065a82c99856c0a80be711fb3/assets/v2-wagc/logo.png)  
+  - [v2 SVG](https://raw.githubusercontent.com/btestrap-ship-it/Genesis-core-AGC-/main/assets/v2-wagc/logo.svg)
 
 ---
 
 ## 🎨 Brand Assets
 
 All official logos are versioned for clarity and consistency.  
-Raw GitHub links are provided above for direct use in wallets, explorers, websites, or documentation.
+Raw GitHub links above can be used in wallets, explorers, websites, or documentation.
 
 ---
 
