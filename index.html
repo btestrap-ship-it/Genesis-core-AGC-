@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGC ARCHITECTS HUB | GENESIS ROULETTE</title>
+    
+    <!-- ИСПРАВЛЕНО: Правильное подключение SDK Thirdweb -->
+    <script src="https://unpkg.com"></script>
+    
+    <style>
+        body { background: #050505; color: gold; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; border: 1px solid #222; padding: 30px; border-radius: 30px; background: #0a0a0a; box-shadow: 0 0 40px rgba(255,215,0,0.15); }
+        #wheel { width: 220px; height: 220px; border: 8px double gold; border-radius: 50%; margin: 30px auto; 
+                 display: flex; align-items: center; justify-content: center; font-size: 60px; 
+                 transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1); background: radial-gradient(circle, #111, #000); }
+        .btn { background: gold; color: #000; padding: 18px 45px; border-radius: 40px; border: none; font-weight: bold; cursor: pointer; font-size: 18px; width: 100%; transition: 0.3s; }
+        .btn:hover { box-shadow: 0 0 20px gold; transform: scale(1.02); }
+        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        #status { margin: 20px 0; color: cyan; font-size: 14px; min-height: 20px; }
+        .win-box { margin-top: 20px; padding: 15px; border: 1px solid #00ff00; color: #00ff00; border-radius: 15px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-shadow: 0 0 15px gold;">ARCHITECTS HUB</h1>
+        <p style="color: #666; font-size: 12px; margin-bottom: 25px;">Verified by Thirdweb Ecosystem</p>
+        
+        <button id="connectBtn" class="btn">ПОДКЛЮЧИТЬ КОШЕЛЕК</button>
+        <div id="status">Требуется авторизация Архитектора</div>
+
+        <div id="gameUI" style="display: none; opacity: 0; transition: 1s;">
+            <div id="coreInfo" style="margin-bottom: 15px; font-weight: bold;"></div>
+            <div id="wheel">💎</div>
+            <button id="spinBtn" class="btn">КРУТИТЬ (1 ENERGY)</button>
+            <div id="winBox" class="win-box"></div>
+        </div>
+    </div>
+
+    <script>
+        // ТВОИ ДАННЫЕ
+        const CLIENT_ID = "c34b80ec64fad099c76d49f9684f5fdf"; 
+        const NFT_ADDR = "0x99b91cEAF77d92958682cA404255CB523EE49454";
+        const TOKEN_ADDR = "0xe56a08f3A9c6f24473D6F8a03A12E2d62409c1F9";
+
+        // Инициализация SDK
+        const sdk = new window.ThirdwebSDK("polygon", { clientId: CLIENT_ID });
+        let userAddress, multiplier = 1;
+
+        async function connect() {
+            const status = document.getElementById('status');
+            try {
+                status.innerText = "Ожидание кошелька...";
+                // Вызывает окно выбора кошелька (MetaMask, Trust, WalletConnect)
+                const wallet = await sdk.wallet.connect(); 
+                userAddress = await wallet.getAddress();
+                
+                document.getElementById('connectBtn').style.display = "none";
+                status.innerText = "Подключено: " + userAddress.slice(0,6) + "...";
+                checkNFT();
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Ошибка входа. Попробуйте еще раз.";
+            }
+        }
+
+        async function checkNFT() {
+            const status = document.getElementById('status');
+            status.innerText = "Проверка доступа...";
+            
+            try {
+                const contract = await sdk.getContract(NFT_ADDR);
+                // Проверяем наличие NFT (ERC1155)
+                const balance = await contract.erc1155.balanceOf(userAddress, 0); 
+                
+                if (balance.toNumber() > 0) {
+                    const nfts = await contract.erc1155.getOwned(userAddress);
+                    const bestNFT = nfts[0];
+                    const level = parseInt(bestNFT.metadata.attributes?.find(a => a.trait_type === "Level")?.value) || 1000;
+                    multiplier = 1 + (level / 1000000);
+
+                    document.getElementById('gameUI').style.display = "block";
+                    setTimeout(() => document.getElementById('gameUI').style.opacity = "1", 100);
+                    document.getElementById('coreInfo').innerHTML = `Ядро: ${bestNFT.metadata.name}<br><span style='color:cyan'>Boost: x${multiplier.toFixed(2)}</span>`;
+                    status.innerText = "ДОСТУП РАЗРЕШЕН";
+                } else {
+                    status.innerHTML = "<b style='color:red'>НЕТ NFT АРХИТЕКТОРА</b><br><a href='https://opensea.io' target='_blank' style='color:gold'>Купить на OpenSea</a>";
+                }
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Ошибка связи с блокчейном.";
+            }
+        }
+
+        document.getElementById('spinBtn').onclick = () => {
+            const wheel = document.getElementById('wheel');
+            const winBox = document.getElementById('winBox');
+            const spinBtn = document.getElementById('spinBtn');
+            
+            spinBtn.disabled = true;
+            winBox.style.display = "none";
+            
+            const deg = 1800 + Math.random() * 360;
+            wheel.style.transform = `rotate(${deg}deg)`;
+            
+            setTimeout(() => {
+                const winAmount = Math.floor((Math.random() * 50 + 10) * multiplier);
+                winBox.innerHTML = `ВЫИГРЫШ: ${winAmount} $WAGC<br><small>(Множитель x${multiplier.toFixed(2)} применен)</small>`;
+                winBox.style.display = "block";
+                spinBtn.disabled = false;
+            }, 3000);
+        };
+
+        document.getElementById('connectBtn').onclick = connect;
+    </script>
+</body>
+</html>
