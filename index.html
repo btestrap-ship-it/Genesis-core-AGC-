@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGC ARCHITECTS HUB | ROULETTE</title>
+    <script src="https://cdnjs.cloudflare.com"></script>
+    <style>
+        body { background: #050505; color: gold; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 500px; margin: 0 auto; border: 1px solid #222; padding: 30px; border-radius: 30px; background: #0a0a0a; box-shadow: 0 0 30px rgba(255,215,0,0.1); }
+        h1 { text-shadow: 0 0 15px gold; letter-spacing: 2px; }
+        #wheel { width: 220px; height: 220px; border: 8px double gold; border-radius: 50%; margin: 30px auto; 
+                 display: flex; align-items: center; justify-content: center; font-size: 60px; 
+                 transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1); background: radial-gradient(circle, #111, #000); }
+        .btn { background: gold; color: #000; padding: 18px 45px; border-radius: 40px; border: none; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; width: 100%; }
+        .btn:hover { transform: scale(1.02); box-shadow: 0 0 20px gold; }
+        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        #status { margin: 20px 0; color: cyan; font-size: 14px; min-height: 20px; }
+        .win-box { margin-top: 20px; padding: 15px; border: 1px solid #00ff00; color: #00ff00; border-radius: 15px; display: none; animation: fadeIn 1s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ARCHITECTS HUB</h1>
+        <p style="color: #666; font-size: 12px;">Web3 Genesis Roulette v1.0</p>
+        
+        <button id="mainBtn" class="btn"> </button>
+        <div id="status"> ...</div>
+
+        <div id="gameUI" style="opacity: 0.3; pointer-events: none;">
+            <div id="wheel"></div>
+            <button id="spinBtn" class="btn"> (1 ENERGY)</button>
+            <div id="winBox" class="win-box"></div>
+        </div>
+    </div>
+
+    <script>
+        const NFT_ADDR = "0x99b91cEAF77d92958682cA404255CB523EE49454";
+        const TOKEN_ADDR = "0xe56a08f3A9c6f24473D6F8a03A12E2d62409c1F9";
+        const POLYGON_CHAIN_ID = "0x89"; // ID  Polygon
+
+        let provider, signer, address;
+
+        // 1.  
+        async function connect() {
+            if (!window.ethereum) return alert(" MetaMask  Trust Wallet!");
+            
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                address = accounts[0];
+                
+                //  
+                const { chainId } = await provider.getNetwork();
+                if (chainId !== 137) {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: POLYGON_CHAIN_ID }] });
+                }
+
+                document.getElementById('mainBtn').style.display = "none";
+                document.getElementById('status').innerText = ": " + address.slice(0,6) + "...";
+                checkNFT();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status').innerText = " ";
+            }
+        }
+
+        // 2.  NFT ( )
+        async function checkNFT() {
+            const abi = ["function balanceOf(address owner) view returns (uint256)"];
+            const contract = new ethers.Contract(NFT_ADDR, abi, provider);
+            const balance = await contract.balanceOf(address);
+            
+            if (balance > 0) {
+                document.getElementById('gameUI').style.opacity = "1";
+                document.getElementById('gameUI').style.pointerEvents = "all";
+                document.getElementById('status').innerText = "  !  .";
+            } else {
+                document.getElementById('status').innerHTML = " : <a href='#' style='color:gold'> </a>";
+            }
+        }
+
+        // 3.  
+        document.getElementById('spinBtn').onclick = () => {
+            const spinBtn = document.getElementById('spinBtn');
+            const wheel = document.getElementById('wheel');
+            const winBox = document.getElementById('winBox');
+
+            spinBtn.disabled = true;
+            winBox.style.display = "none";
+            
+            const deg = 1800 + Math.random() * 360;
+            wheel.style.transform = `rotate(${deg}deg)`;
+            
+            setTimeout(() => {
+                const winAmount = Math.floor(Math.random() * 90) + 10;
+                winBox.innerHTML = `: ${winAmount} $WAGC<br><button class='btn' style='margin-top:10px; padding:10px;' onclick='alert("   !")'></button>`;
+                winBox.style.display = "block";
+                spinBtn.disabled = false;
+            }, 3000);
+        };
+
+        document.getElementById('mainBtn').onclick = connect;
+    </script>
+</body>
+</html>
