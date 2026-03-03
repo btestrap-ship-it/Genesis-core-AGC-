@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AGC Architects Roulette</title>
+    <!-- ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+    <!-- Web3Modal -->
+    <script src="https://cdn.jsdelivr.net/npm/web3modal@1.9.9/dist/index.js"></script>
+    <!-- WalletConnect Provider -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+    <style>
+        body { background: #050505; color: gold; font-family: sans-serif; text-align: center; padding: 20px; }
+        #wheel { width: 250px; height: 250px; border: 10px double gold; border-radius: 50%; margin: 30px auto; 
+                 display: flex; align-items: center; justify-content: center; font-size: 50px; transition: transform 3s cubic-bezier(0.1, 0, 0.1, 1); }
+        .btn { background: gold; color: black; padding: 15px 40px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #status { margin-top: 20px; color: cyan; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>ARCHITECTS HUB</h1>
+    <button id="connectBtn" class="btn">CONNECT WALLET</button>
+    
+    <div id="gameUI" style="display:none;">
+        <div id="status">Checking your Core...</div>
+        <div id="wheel"></div>
+        <button id="spinBtn" class="btn">SPIN FOR $WAGC</button>
+        <h2 id="result"></h2>
+        <button id="claimBtn" class="btn" style="display:none;">CLAIM $WAGC</button>
+    </div>
+
+    <script>
+        const NFT_ADDR = "0x99b91cEAF77d92958682cA404255CB523EE49454";
+        const TOKEN_ADDR = "0xe56a08f3A9c6f24473D6F8a03A12E2d62409c1F9";
+        let provider, signer, address, multiplier = 1, winAmount = 0;
+
+        async function connect() {
+            try {
+                const providerOptions = {
+                    walletconnect: {
+                        package: window.WalletConnectProvider.default,
+                        options: {
+                            rpc: {
+                                1: "https://mainnet.infura.io/v3/YOUR_INFURA_ID", // Ethereum
+                                137: "https://polygon-rpc.com" // Polygon
+                            }
+                        }
+                    }
+                };
+
+                const web3Modal = new window.Web3Modal.default({
+                    cacheProvider: false,
+                    providerOptions
+                });
+
+                const instance = await web3Modal.connect();
+                provider = new ethers.providers.Web3Provider(instance);
+                signer = provider.getSigner();
+                address = await signer.getAddress();
+
+                document.getElementById('connectBtn').innerText = "Connected: " + address.slice(0,6) + "...";
+                checkAccess();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status').innerText = ": " + err.message;
+            }
+        }
+
+        async function checkAccess() {
+            try {
+                const abi = ["function balanceOf(address owner) view returns (uint256)"];
+                const contract = new ethers.Contract(NFT_ADDR, abi, provider);
+                const balance = await contract.balanceOf(address);
+                
+                if (balance > 0) {
+                    document.getElementById('gameUI').style.display = "block";
+                    document.getElementById('status').innerText = "Architect Core Detected! Bonus active.";
+                } else {
+                    document.getElementById('status').innerText = "ACCESS DENIED: Buy Core on OpenSea";
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status').innerText = "   NFT: " + err.message;
+            }
+        }
+
+        document.getElementById('spinBtn').onclick = () => {
+            const deg = 1800 + Math.random() * 360;
+            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
+            document.getElementById('spinBtn').style.display = "none";
+            
+            setTimeout(() => {
+                winAmount = Math.floor((Math.random() * 50 + 10) * multiplier);
+                document.getElementById('result').innerText = `WIN: ${winAmount} $WAGC`;
+                document.getElementById('claimBtn').style.display = "inline-block";
+            }, 3000);
+        };
+
+        document.getElementById('claimBtn').onclick = async () => {
+            try {
+                const abi = ["function transfer(address to, uint256 amount) returns (bool)"];
+                const token = new ethers.Contract(TOKEN_ADDR, abi, signer);
+                const tx = await token.transfer(address, ethers.utils.parseUnits(winAmount.toString(), 18));
+                document.getElementById('status').innerText = "Claiming... TX: " + tx.hash;
+                await tx.wait();
+                document.getElementById('status').innerText = "Claim successful!";
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status').innerText = "Claim failed: " + err.message;
+            }
+        };
+
+        document.getElementById('connectBtn').onclick = connect;
+    </script>
+</body>
+</html>
