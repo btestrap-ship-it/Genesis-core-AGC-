@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AGC Roulette</title>
+    <!-- Прямые ссылки на библиотеки -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <script src="https://cdn.jsdelivr.net"></script>
+</head>
+<body style="background:#000; color:#fff; text-align:center; font-family:sans-serif; padding-top:50px;">
+    <div id="root">DOWNLOADING</div>
+
+    <script type="text/babel">
+        const { createThirdwebClient } = window.thirdweb;
+        const { ConnectButton, ThirdwebProvider } = window.thirdweb.react;
+
+        const client = createThirdwebClient({ 
+            clientId: "189a85cd28b975cc8a024f2be6423a07" 
+        });
+
+        function App() {
+            return (
+                <div>
+                    <h1>AGC Roulette</h1>
+                    <p>Если видишь это — код работает!</p>
+                    <ConnectButton client={client} />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(
+            <ThirdwebProvider>
+                <App />
+            </ThirdwebProvider>
+        );
+    </script>
+</body>
+</html>
