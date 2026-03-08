@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGC Roulette</title>
+    <!-- Загружаем React -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
+    <!-- Загружаем Babel для работы JSX в браузере -->
+    <script src="https://unpkg.com"></script>
+    <!-- Загружаем Thirdweb SDK -->
+    <script src="https://cdn.jsdelivr.net"></script>
+</head>
+<body style="background-color: #121212; color: white; margin: 0;">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Получаем инструменты из глобального объекта thirdweb
+        const { createThirdwebClient, getContract, defineChain } = window.thirdweb;
+        const { ConnectButton, TransactionButton, useActiveAccount, useReadContract, ThirdwebProvider } = window.thirdweb.react;
+        const { balanceOf } = window.thirdweb.extensions.erc1155;
+        const { claimERC20 } = window.thirdweb.extensions.airdrop;
+
+        const client = createThirdwebClient({ clientId: "189a85cd28b975cc8a024f2be6423a07" });
+        const polygon = defineChain(137);
+
+        function Roulette() {
+            const account = useActiveAccount();
+            
+            const nftContract = getContract({ 
+                client, 
+                chain: polygon, 
+                address: "0x99b91cEAF77d92958682cA404255CB523EE49454" 
+            });
+            
+            const airdropContract = getContract({ 
+                client, 
+                chain: polygon, 
+                address: "0xe616aABc2f365c679867eE563566307D236c5414" 
+            });
+
+            const { data: nftBalance, isLoading } = useReadContract(balanceOf, {
+                contract: nftContract,
+                owner: account?.address || "0x0000000000000000000000000000000000000000",
+                tokenId: 0n,
+            });
+
+            const hasKey = nftBalance && nftBalance > 0n;
+
+            return (
+                <div style={{ textAlign: "center", paddingTop: "100px", fontFamily: "sans-serif" }}>
+                    <h1 style={{ color: "#f0b90b" }}>AGC Roulette</h1>
+                    <div style={{ marginBottom: "30px" }}>
+                        <ConnectButton client={client} />
+                    </div>
+
+                    {account && (
+                        <div style={{ padding: "20px", border: "1px solid #333", borderRadius: "10px", display: "inline-block" }}>
+                            {isLoading ? (
+                                <p>Проверка NFT ключа...</p>
+                            ) : hasKey ? (
+                                <div>
+                                    <p style={{ color: "#4caf50", fontWeight: "bold" }}>✅ Доступ разрешен (NFT найден)</p>
+                                    <TransactionButton
+                                        transaction={() => claimERC20({
+                                            contract: airdropContract,
+                                            receiver: account.address,
+                                            quantity: "100"
+                                        })}
+                                        onTransactionConfirmed={() => alert("Успешно! 100 AGC отправлены.")}
+                                    >
+                                        Крутить рулетку
+                                    </TransactionButton>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p style={{ color: "#f44336" }}>❌ Ошибка: NFT ключ не найден</p>
+                                    <small>Вам нужен Genesis Core NFT (ID: 0)</small>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Рендерим приложение
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(
+            <ThirdwebProvider>
+                <Roulette />
+            </ThirdwebProvider>
+        );
+    </script>
+</body>
+</html>
