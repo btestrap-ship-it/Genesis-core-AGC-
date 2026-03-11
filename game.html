@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGC Divine Mechanism</title>
+    <!-- Подключаем библиотеку для связи с блокчейном -->
+    <script src="https://cdnjs.cloudflare.com"></script>
+    
+    <style>
+        body {
+            background: radial-gradient(circle, #1a0f00 0%, #000 100%);
+            color: #ffd700;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Главный артефакт */
+        #mechanism {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: conic-gradient(#ffd700, #b8860b, #ffd700);
+            box-shadow: 0 0 50px #ffaa00;
+            animation: pulse 4s infinite ease-in-out;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.2); }
+        }
+
+        .stats-box {
+            margin-top: 25px;
+            background: rgba(30, 15, 0, 0.8);
+            border: 1px solid #ffd700;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            width: 300px;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-main {
+            background: linear-gradient(45deg, #b8860b, #ffd700);
+            border: none;
+            color: #000;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        /* Экран рулетки */
+        #roulette-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.96);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border: 6px solid #ffd700;
+            border-radius: 50%;
+            background: conic-gradient(
+                #221100 0deg 60deg, #442200 60deg 120deg, 
+                #221100 120deg 180deg, #442200 180deg 240deg, 
+                #221100 240deg 300deg, #ffd700 300deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #fff;
+            z-index: 110;
+        }
+
+        .sector-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mechanism" onclick="openRoulette()">☀️</div>
+
+    <div class="stats-box">
+        <div style="font-size: 0.8em; opacity: 0.7;">GENESIS STORAGE</div>
+        <div id="balance-display" style="font-size: 2.2em; font-weight: bold; text-shadow: 0 0 10px #ffd700;">0.00 $SAGC</div>
+        <div id="nft-status" style="font-size: 0.7em; color: #888; margin-top: 5px;">Проверка NFT...</div>
+        <button class="btn-main" onclick="alert('Перевод в обработке...')">EXTRACT FUNDS</button>
+    </div>
+
+    <!-- Модальное окно рулетки -->
+    <div id="roulette-screen">
+        <h2 style="letter-spacing: 3px;">DIVINE SPIN</h2>
+        <div id="wheel-container">
+            <div class="pointer"></div>
+            <div id="wheel">
+                <!-- Надписи на секторах (по 60 градусов) -->
+                <div class="sector-label" style="transform: rotate(30deg) translateY(-110px);">70</div>
+                <div class="sector-label" style="transform: rotate(90deg) translateY(-110px);">350</div>
+                <div class="sector-label" style="transform: rotate(150deg) translateY(-110px);">700</div>
+                <div class="sector-label" style="transform: rotate(210deg) translateY(-110px);">1750</div>
+                <div class="sector-label" style="transform: rotate(270deg) translateY(-110px);">3500</div>
+                <div class="sector-label" style="transform: rotate(330deg) translateY(-110px); color:#000;">7000</div>
+            </div>
+        </div>
+        <button class="btn-main" id="spin-btn" onclick="spinWheel()" style="width: 200px; margin-top: 40px;">ACTIVATE SPIN</button>
+        <button onclick="closeRoulette()" style="background:none; border:none; color:#777; margin-top:20px; cursor:pointer;">BACK</button>
+    </div>
+
+<script>
+    // --- Конфигурация ---
+    const NFT_CONTRACT = "0x99b91cEAF77d92958682cA404255CB523EE49454";
+    const PRIZES = [70, 350, 700, 1750, 3500, 7000]; // Награды в секторах
+    
+    let balance = parseFloat(localStorage.getItem('sagc_balance')) || 0;
+    let hasNFT = false;
+    let isSpinning = false;
+
+    // --- Блокчейн логика ---
+    async function checkNFT() {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const contract = new ethers.Contract(NFT_CONTRACT, ["function balanceOf(address) view returns (uint256)"], provider);
+                const nftBalance = await contract.balanceOf(accounts[0]);
+                
+                if (nftBalance > 0) {
+                    hasNFT = true;
+                    document.getElementById('nft-status').innerText = "NFT ACTIVE (2X SPEED)";
+                    document.getElementById('nft-status').style.color = "#00ff00";
+                } else {
+                    document.getElementById('nft-status').innerText = "NFT NOT FOUND (NORMAL SPEED)";
+                }
+            } catch (e) {
+                document.getElementById('nft-status').innerText = "CONNECTION ERROR";
+            }
+        } else {
+            document.getElementById('nft-status').innerText = "METAMASK NOT DETECTED";
+        }
+    }
+
+    // --- Логика майнинга ---
+    function updateMining() {
+        let rate = hasNFT ? (140 / 3600) : (70 / 3600); // 140 в час если есть NFT, иначе 70
+        balance += rate;
+        document.getElementById('balance-display').innerText = balance.toFixed(4) + " $SAGC";
+        localStorage.setItem('sagc_balance', balance);
+    }
+    setInterval(updateMining, 1000);
+
+    // --- Логика рулетки ---
+    function openRoulette() { document.getElementById('roulette-screen').style.display = 'flex'; }
+    function closeRoulette() { document.getElementById('roulette-screen').style.display = 'none'; }
+
+    function spinWheel() {
+        if (isSpinning) return;
+        isSpinning = true;
+        const wheel = document.getElementById('wheel');
+        
+        // Минимум 5 оборотов + рандомный угол
+        const randomRotation = Math.floor(Math.random() * 360);
+        const totalDeg = 1800 + randomRotation;
+        
+        wheel.style.transform = `rotate(${totalDeg}deg)`;
+
+        setTimeout(() => {
+            // Рассчитываем какой сектор сверху
+            const normalizedDeg = (360 - (totalDeg % 360)) % 360;
+            const prizeIndex = Math.floor(normalizedDeg / 60);
+            const winAmount = PRIZES[prizeIndex];
+
+            alert("DIVINE BLESSING!\n+" + winAmount + " $SAGC");
+            
+            balance += winAmount;
+            isSpinning = false;
+            closeRoulette();
+            wheel.style.transition = 'none';
+            wheel.style.transform = `rotate(${totalDeg % 360}deg)`;
+            setTimeout(() => { wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.15, 1)'; }, 50);
+        }, 4100);
+    }
+
+    // Старт
+    window.onload = checkNFT;
+</script>
+</body>
+</html>
