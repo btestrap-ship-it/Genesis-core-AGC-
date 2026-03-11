@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SAGC Divine Mechanism</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script src="https://unpkg.com/@thirdweb-dev/sdk@latest/dist/thirdweb-dev-sdk.browser.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="mechanism" onclick="openRoulette()">☀️</div>
+
+<div class="stats">
+
+<div id="wallet">Wallet not connected</div>
+
+<div id="balance">0 SAGC</div>
+
+<div id="nft-status">Checking NFT...</div>
+
+<button onclick="connectWallet()">CONNECT WALLET</button>
+
+<button onclick="withdraw()">EXTRACT</button>
+
+</div>
+
+<div id="roulette">
+
+<div class="pointer"></div>
+
+<div id="wheel"></div>
+
+<button onclick="spin()">SPIN</button>
+
+<button onclick="closeRoulette()">BACK</button>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>

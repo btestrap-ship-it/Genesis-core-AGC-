@@ -1,0 +1,76 @@
+body{
+
+background:#000;
+color:#ffd700;
+font-family:Arial;
+text-align:center;
+margin-top:80px;
+
+}
+
+#mechanism{
+
+width:200px;
+height:200px;
+border-radius:50%;
+background:gold;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:60px;
+margin:auto;
+cursor:pointer;
+
+}
+
+.stats{
+
+margin-top:30px;
+
+}
+
+button{
+
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:10px;
+background:gold;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+#roulette{
+
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+
+}
+
+#wheel{
+
+width:300px;
+height:300px;
+border-radius:50%;
+border:5px solid gold;
+background:conic-gradient(
+#111 0 60deg,
+#333 60 120deg,
+#111 120 180deg,
+#333 180 240deg,
+#111 240 300deg,
+gold 300 360deg
+);
+
+transition:transform 4s;
+
+}
